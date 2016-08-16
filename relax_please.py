@@ -10,6 +10,7 @@ import threading
 import subprocess
 
 
+# 监听者抽象借口，即Subject，是事件的来源
 class Listener:
 	def __init__(self):
 		self._observers = []
@@ -82,10 +83,17 @@ class SayGoodNightListener(Listener):
 			now = time.localtime(time.time())
 			if now.tm_hour >= self.night or now.tm_hour <= self.morning:
 				self.notify()
-			time.sleep(10)
+			time.sleep(10)	# 这个10应该作为参数才对。
 
 
-class NotificaitonSender:
+# 观察者的抽象借口，后续可能有多种形式的观察者
+# 比如通过notify-send发送泡泡窗口，还可以记录到日志，还可以播放闹铃提醒等等
+class Observer:
+	def update(self):
+		raise NotImplementedError("Must subclass me")
+
+
+class NotifySendObserver(Observer):
 	"""通过ubuntu上的nofity-send在屏幕右上角发送提醒信息"""
 
 	def __init__(self, title, msg):
@@ -96,14 +104,12 @@ class NotificaitonSender:
 		self.sendNotification(self.title, self.msg)
 
 	def sendNotification(self, title, msg):
-		# os.system('notify-send "TITLE" "MESSAGE"')
-		os.system('export DISPLAY=:0.0;notify-send "{0}" "{1}"'.format(title, msg))
-		with open('/tmp/lalalalala.txt', 'a') as f:
-			f.write(msg + '\n')
+		os.system('export DISPLAY=:0.0; notify-send "{0}" "{1}"'.format(title, msg))
+
 
 def relaxSupervisor():
 	print('relax')
-	hardWorkSender = NotificaitonSender("请注意休息", "你已超负荷工作！！！必须马上停下来休息！")
+	hardWorkSender = NotifySendObserver("请注意休息", "你已超负荷工作！！！必须马上停下来休息！")
 	listener = KeyBoardListener(maxWorkTime=10, leastRelaxTime=10, notifyInterval=15)
 	listener.attach(hardWorkSender)
 	listener.listening()
@@ -111,7 +117,7 @@ def relaxSupervisor():
 
 def goodNightSupervisor():
 	print('good night')
-	goodNightSender = NotificaitonSender("晚安", "夜深了，早点睡～再不睡就真的会变丑到家了")
+	goodNightSender = NotifySendObserver("晚安", "夜深了，早点睡～再不睡就真的会变丑到家了")
 	listener = SayGoodNightListener()
 	listener.attach(goodNightSender)
 	listener.listening()
