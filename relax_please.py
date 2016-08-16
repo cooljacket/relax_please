@@ -73,17 +73,18 @@ class KeyBoardListener(Listener):
 
 
 class SayGoodNightListener(Listener):
-	def __init__(self, night=23, morning=5):
+	def __init__(self, night=23, morning=5, notifyInterval=30):
 		Listener.__init__(self)
 		self.morning = morning
 		self.night = night
+		self.notifyInterval = notifyInterval
 
 	def listening(self):
 		while True:
 			now = time.localtime(time.time())
 			if now.tm_hour >= self.night or now.tm_hour <= self.morning:
 				self.notify()
-			time.sleep(10)	# 这个10应该作为参数才对。
+			time.sleep(self.notifyInterval)	# 这个10应该作为参数才对。
 
 
 # 观察者的抽象借口，后续可能有多种形式的观察者
@@ -118,7 +119,7 @@ def relaxSupervisor():
 def goodNightSupervisor():
 	print('good night')
 	goodNightSender = NotifySendObserver("晚安", "夜深了，早点睡～再不睡就真的会变丑到家了")
-	listener = SayGoodNightListener()
+	listener = SayGoodNightListener(notifyInterval=30)
 	listener.attach(goodNightSender)
 	listener.listening()
 

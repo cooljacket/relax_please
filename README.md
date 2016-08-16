@@ -1,4 +1,5 @@
 # 休息吧，程序员
+项目的详细分析请移步我的博客交流：http://blog.csdn.net/Jacketinsysu/article/details/52226229
 
 ## 功能介绍
 relax_please.py（中文意思是，休息吧！程序猿），是一个运行在**ubuntu**上（其它平台还没测试过，估计只要能装nofity-send的都行）的提醒脚本，根据你设定的参数，利用nofity-send这个库来向桌面发送消息提醒你应该休息了！目前有两部分的逻辑：
